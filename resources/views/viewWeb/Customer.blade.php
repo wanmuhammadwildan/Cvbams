@@ -35,7 +35,6 @@
         <a href="{{ route('transkrip.index') }}" class="{{ request()->is('transkrip*') ? 'active' : '' }}""><i class="fas fa-chart-bar"></i> Transkrip</a>
     </li>
     <li>
-        <a href="#"><i class="fas fa-cog"></i> Pengaturan</a>
     </li>
 </ul>
         </aside>
