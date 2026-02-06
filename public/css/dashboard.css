@@ -1,0 +1,273 @@
+/* css/dashboard.css */
+
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.dashboard-header h2 {
+    color: var(--primary);
+    font-size: 2rem;
+    margin: 0;
+}
+
+.dashboard-subtitle {
+    color: var(--gray);
+    font-size: 0.95rem;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.date-input {
+    background-color: white;
+    border: 1px solid var(--border);
+    color: #333;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.date-input::placeholder {
+    color: var(--gray);
+}
+
+.filter-btn {
+    background-color: #9b59b6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.filter-btn:hover {
+    background-color: #8e44ad;
+}
+
+/* Stats Cards */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    border-left: 4px solid;
+    border-top: 1px solid #f0f0f0;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.income-today {
+    border-left-color: #2ecc71;
+}
+
+.stat-card.income-month {
+    border-left-color: #3498db;
+}
+
+.stat-card.active-member {
+    border-left-color: #f39c12;
+}
+
+.stat-card.total-member {
+    border-left-color: #e74c3c;
+}
+
+.stat-icon {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.stat-card.income-today .stat-icon {
+    color: #2ecc71;
+}
+
+.stat-card.income-month .stat-icon {
+    color: #3498db;
+}
+
+.stat-card.active-member .stat-icon {
+    color: #f39c12;
+}
+
+.stat-card.total-member .stat-icon {
+    color: #e74c3c;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 8px 0;
+}
+
+.stat-label {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.stat-subtitle {
+    color: #bdc3c7;
+    font-size: 0.8rem;
+    margin-top: 8px;
+}
+
+/* Content Sections */
+.content-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 1400px) {
+    .content-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+.section {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f0f0f0;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title i {
+    color: #3498db;
+    margin-right: 10px;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 220px;
+    width: 100%;
+    overflow: hidden;
+}
+.voucher-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.voucher-table th {
+    text-align: left;
+    padding: 12px 0;
+    color: var(--gray);
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+
+.voucher-table td {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Member Table */
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.member-table th {
+    text-align: left;
+    padding: 12px 0;
+    color: var(--gray);
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+}
+
+.member-table td {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.member-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Payment Gateway */
+.payment-gateway {
+    margin-bottom: 25px;
+}
+
+.gateway-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--success);
+}
+
+/* Activity Log */
+.activity-log {
+    background-color: var(--light-gray);
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid var(--secondary);
+}
+
+.activity-time {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.activity-desc {
+    font-weight: 500;
+}
+
+/* Responsive for Dashboard */
+@media (max-width: 1100px) {
+    .content-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+}
