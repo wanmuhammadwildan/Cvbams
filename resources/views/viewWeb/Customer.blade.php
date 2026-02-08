@@ -137,6 +137,10 @@
                                 <label for="tanggal-expire">Jatuh Tempo</label>
                                 <input type="date" name="expiry_date" id="tanggal-expire" class="form-control">
                             </div>
+                            <div class="form-group mb-3">
+    <label>Keterangan / Catatan</label>
+    <textarea name="keterangan" class="form-control" rows="2" placeholder="Contoh: Pasang di ruko lantai 2"></textarea>
+</div>
                             <div class="form-group">
                                 <label>Status Pelanggan</label>
                                 <div class="status-options">
@@ -235,6 +239,7 @@
                                 <th>Tanggal Pasang</th>
                                 <th>Jatuh Tempo</th>
                                 <th>Status</th>
+                                <th>Keterangan</th>
                                 <th width="120">Aksi</th>
                             </tr>
                             
@@ -251,16 +256,23 @@
                                 <td>{{ $item->installation_date }}</td>
                                 <td>{{ $item->expiry_date ?? '-' }}</td>
                                 <td><span class="status-badge {{ $item->status == 'aktif' ? 'status-active' : 'status-expired' }}">{{ ucfirst($item->status) }}</span></td>
+                                <td>{{ $item->keterangan ?? '-' }}</td> <td>
                                 <td>
                                     <div style="display: flex; gap: 5px;">
                                         <button class="btn-icon btn-detail" style="background: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;" 
                                             data-name="{{ $item->full_name }}" data-id="{{ $item->customer_id_string }}" data-phone="{{ $item->phone }}" data-address="{{ $item->address }}" data-package="{{ $item->package }}" data-status="{{ $item->status }}" data-install="{{ $item->installation_date }}" data-expire="{{ $item->expiry_date }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn-icon btn-edit" style="background: #2ecc71; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer;"
-                                            data-dbid="{{ $item->id }}" data-name="{{ $item->full_name }}" data-phone="{{ $item->phone }}" data-status="{{ $item->status }}" data-package="{{ $item->package }}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                        <button class="btn-icon btn-edit" 
+    data-dbid="{{ $item->id }}" 
+    data-name="{{ $item->full_name }}" 
+    data-phone="{{ $item->phone }}" 
+    data-status="{{ $item->status }}" 
+    data-package="{{ $item->package }}"
+    data-keterangan="{{ $item->keterangan }}"  {{-- <--- TAMBAHKAN INI --}}
+    style="...">
+    <i class="fas fa-edit"></i>
+</button>
                                      @php
     $phone = preg_replace('/^0/', '62', $item->phone);
 
@@ -354,6 +366,10 @@
                             <option value="nonaktif">Nonaktif</option>
                         </select>
                     </div>
+                    <div class="form-group mb-3">
+    <label>Keterangan Detail</label>
+    <textarea name="keterangan" id="edit-keterangan" class="form-control" rows="3"></textarea>
+</div>
                     <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px;">Simpan Perubahan</button>
                 </form>
             </div>
@@ -365,6 +381,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchBtn = document.getElementById('btn-search');
     const tableBody = document.getElementById('pelanggan-data');
     const rows = tableBody.getElementsByTagName('tr');
+    // Cari bagian script yang menangani btn-edit, lalu tambahkan baris ini:
+const keterangan = this.getAttribute('data-keterangan'); // Ambil data
+document.getElementById('edit-keterangan').value = keterangan; // Masukkan ke textarea modal
 
     function filterData() {
         const filter = searchInput.value.toLowerCase();

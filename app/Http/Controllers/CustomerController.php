@@ -52,7 +52,8 @@ class CustomerController extends Controller
             'installation_date' => $request->installation_date,
             'expiry_date' => $request->expiry_date,
             'status' => 'aktif', // Default saat daftar baru
-            'notes' => $request->notes
+            'keterangan' => $request->keterangan,
+            
         ]);
 
         return redirect()->route('pelanggan.index')->with('success', 'Data Pelanggan Berhasil Ditambahkan!');
@@ -61,20 +62,24 @@ class CustomerController extends Controller
     /**
      * Memperbarui data pelanggan (Hanya Super Admin)
      */
-    public function update(Request $request, $id)
-    {
-        // KEAMANAN: Cek role
-        if (Auth::user()->role !== 'super_admin') {
-            return redirect()->back()->with('error', 'Akses ditolak!');
-        }
-
-        $customer = Customer::findOrFail($id);
-        
-        // Update menggunakan data dari form
-        $customer->update($request->all());
-
-        return redirect()->route('pelanggan.index')->with('success', 'Data Berhasil Diperbarui!');
+   public function update(Request $request, $id)
+{
+    if (Auth::user()->role !== 'super_admin') {
+        return redirect()->back()->with('error', 'Akses ditolak!');
     }
+
+    $customer = Customer::findOrFail($id);
+
+    $request->validate([
+        'full_name' => 'required',
+        'package'   => 'required',
+        'keterangan'=> 'nullable|string', // <--- Tambahkan Ini
+    ]);
+
+    $customer->update($request->all()); // Ini otomatis mengambil 'keterangan' dari form
+
+    return redirect()->route('pelanggan.index')->with('success', 'Data Berhasil Diperbarui!');
+}
 
     /**
      * Menghapus data pelanggan (Hanya Super Admin)
