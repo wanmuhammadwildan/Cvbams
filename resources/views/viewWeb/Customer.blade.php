@@ -121,12 +121,12 @@
                                 <label for="paket-internet">Paket Internet *</label>
                                 <select name="package" id="paket-internet" class="form-control" required>
                                    <option value="" disabled selected>Pilih paket internet</option>
-                                    <option value="Lama">Paket Lama - 10 Mbps - Rp 100.000/bulan</option>
-                                    <option value="Baru">Paket Baru - 10 Mbps - Rp 110.000/bulan</option>
-                                    <option value="Lama">Paket Lama - 15 Mbps - Rp 150.000/bulan</option>
-                                    <option value="Baru">Paket Baru - 15 Mbps - Rp 165.000/bulan</option>
-                                    <option value="Lama">Paket Lama - 25 Mbps - Rp 250.000/bulan</option>
-                                    <option value="Baru">Paket Baru - 25 Mbps - Rp 275.000/bulan</option>
+                                    <option value="Lama 10 Mbps">Paket Lama - 10 Mbps - Rp 100.000/bulan</option>
+                                    <option value="Baru 10 Mbps">Paket Baru - 10 Mbps - Rp 110.000/bulan</option>
+                                    <option value="Lama 15 Mbps">Paket Lama - 15 Mbps - Rp 150.000/bulan</option>
+                                    <option value="Baru 15 Mbps">Paket Baru - 15 Mbps - Rp 165.000/bulan</option>
+                                    <option value="Lama 25 Mbps">Paket Lama - 25 Mbps - Rp 250.000/bulan</option>
+                                    <option value="Baru 25 Mbps">Paket Baru - 25 Mbps - Rp 275.000/bulan</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -186,14 +186,12 @@
                     </select>
                     <select id="filter-paket" class="form-control">
                         <option value="all">Semua Paket</option>
-                                <option value="Lama">Paket Lama - 10 Mbps - Rp 100.000/bulan</option>
-                                   <option value="" disabled selected>Pilih paket internet</option>
-                                    <option value="Lama">Paket Lama - 10 Mbps - Rp 100.000/bulan</option>
-                                    <option value="Baru">Paket Baru - 10 Mbps - Rp 110.000/bulan</option>
-                                    <option value="Lama">Paket Lama - 15 Mbps - Rp 150.000/bulan</option>
-                                    <option value="Baru">Paket Baru - 15 Mbps - Rp 165.000/bulan</option>
-                                    <option value="Lama">Paket Lama - 25 Mbps - Rp 250.000/bulan</option>
-                                    <option value="Baru">Paket Baru - 25 Mbps - Rp 275.000/bulan</option>
+                        <option value="Lama 10 Mbps">Paket Lama - 10 Mbps</option>
+                        <option value="Baru 10 Mbps">Paket Baru - 10 Mbps</option>
+                        <option value="Lama 15 Mbps">Paket Lama - 15 Mbps</option>
+                        <option value="Baru 15 Mbps">Paket Baru - 15 Mbps</option>
+                        <option value="Lama 25 Mbps">Paket Lama - 25 Mbps</option>
+                        <option value="Baru 25 Mbps">Paket Baru - 25 Mbps</option>
                     </select>
                     <select id="sort-by" class="form-control">
                         <option value="id_asc">ID (CP)</option>
@@ -355,6 +353,8 @@
                         <select name="package" id="edit-paket" class="form-control">
                             <option value="Lama 10 Mbps">Paket Lama - 10 Mbps - Rp 100.000</option>
                             <option value="Baru 10 Mbps">Paket Baru - 10 Mbps - Rp 110.000</option>
+                            <option value="Lama 15 Mbps">Paket Lama - 15 Mbps - Rp 150.000</option>
+                            <option value="Baru 15 Mbps">Paket Baru - 15 Mbps - Rp 165.000</option>
                             <option value="Lama 25 Mbps">Paket Lama - 25 Mbps - Rp 250.000</option>
                             <option value="Baru 25 Mbps">Paket Baru - 25 Mbps - Rp 275.000</option>
                         </select>
@@ -379,43 +379,71 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-pelanggan');
     const searchBtn = document.getElementById('btn-search');
+    const filterStatus = document.getElementById('filter-status');
+    const filterPaket = document.getElementById('filter-paket');
     const tableBody = document.getElementById('pelanggan-data');
     const rows = tableBody.getElementsByTagName('tr');
-    // Cari bagian script yang menangani btn-edit, lalu tambahkan baris ini:
-const keterangan = this.getAttribute('data-keterangan'); // Ambil data
-document.getElementById('edit-keterangan').value = keterangan; // Masukkan ke textarea modal
 
     function filterData() {
-        const filter = searchInput.value.toLowerCase();
-        
+        const searchFilter = searchInput.value.toLowerCase();
+        const statusFilter = filterStatus.value;
+        const paketFilter = filterPaket.value;
+
         for (let i = 0; i < rows.length; i++) {
-            // Kita cek kolom ID (indeks 1) dan Nama (indeks 2)
-            const idCol = rows[i].getElementsByTagName('td')[1];
-            const nameCol = rows[i].getElementsByTagName('td')[2];
-            
-            if (idCol || nameCol) {
-                const idText = idCol.textContent || idCol.innerText;
-                const nameText = nameCol.textContent || nameCol.innerText;
-                
-                if (idText.toLowerCase().indexOf(filter) > -1 || nameText.toLowerCase().indexOf(filter) > -1) {
-                    rows[i].style.display = "";
+            const row = rows[i];
+            // Kolom: 0=No, 1=ID, 2=Nama, 3=No HP, 4=Alamat, 5=Paket, 6=Tanggal Pasang, 7=Jatuh Tempo, 8=Status, 9=Keterangan
+            const idCol = row.getElementsByTagName('td')[1];
+            const nameCol = row.getElementsByTagName('td')[2];
+            const phoneCol = row.getElementsByTagName('td')[3];
+            const paketCol = row.getElementsByTagName('td')[5];
+            const statusCol = row.getElementsByTagName('td')[8];
+
+            if (idCol && nameCol && phoneCol && paketCol && statusCol) {
+                const idText = (idCol.textContent || idCol.innerText).toLowerCase();
+                const nameText = (nameCol.textContent || nameCol.innerText).toLowerCase();
+                const phoneText = (phoneCol.textContent || phoneCol.innerText).toLowerCase();
+                const paketText = (paketCol.textContent || paketCol.innerText).toLowerCase();
+                const statusText = (statusCol.textContent || statusCol.innerText).toLowerCase();
+
+                // Cek pencarian teks (ID, Nama, No HP)
+                const matchesSearch = searchFilter === '' ||
+                    idText.indexOf(searchFilter) > -1 ||
+                    nameText.indexOf(searchFilter) > -1 ||
+                    phoneText.indexOf(searchFilter) > -1;
+
+                // Cek filter status
+                const matchesStatus = statusFilter === 'all' ||
+                    (statusFilter === 'aktif' && statusText.includes('aktif')) ||
+                    (statusFilter === 'nonaktif' && statusText.includes('nonaktif'));
+
+                // Cek filter paket
+                const matchesPaket = paketFilter === 'all' ||
+                    paketText.indexOf(paketFilter.toLowerCase()) > -1;
+
+                if (matchesSearch && matchesStatus && matchesPaket) {
+                    row.style.display = "";
                 } else {
-                    rows[i].style.display = "none";
+                    row.style.display = "none";
                 }
             }
         }
     }
 
+    // Jalankan fungsi saat input pencarian berubah (real-time)
+    searchInput.addEventListener('input', filterData);
+
     // Jalankan fungsi saat tombol diklik
     searchBtn.addEventListener('click', filterData);
+
+    // Jalankan fungsi saat filter status berubah
+    filterStatus.addEventListener('change', filterData);
+
+    // Jalankan fungsi saat filter paket berubah
+    filterPaket.addEventListener('change', filterData);
 
     // Jalankan fungsi saat user tekan "Enter" di kotak pencarian
     searchInput.addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
-            filterData();
-        }
-        // Jika kotak pencarian dikosongkan, munculkan semua lagi
-        if (searchInput.value === "") {
             filterData();
         }
     });

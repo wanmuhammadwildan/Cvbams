@@ -33,13 +33,6 @@
 @section('content')
 <div class="header">
     <h2>Transkrip Pembayaran</h2>
-    <div class="user-info">
-        <div style="text-align: right; margin-right: 15px;">
-            <h4>{{ Auth::user()->full_name }}</h4>
-            <p style="font-size: 0.8rem; color: var(--gray);">{{ ucfirst(Auth::user()->role) }}</p>
-        </div>
-        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->full_name) }}&background=3498db&color=fff" alt="Avatar">
-    </div>
 </div>
 
 <div class="filter-section">
@@ -66,12 +59,8 @@
         </div>
 
         <div class="filter-group">
-            <label><i class="fas fa-wifi"></i> Paket Internet</label>
-            <select name="package" class="form-control">
-                <option value="all">Semua Paket</option>
-                <option value="10 Mbps">10 Mbps</option>
-                <option value="25 Mbps">25 Mbps</option>
-            </select>
+            <label><i class="fas fa-user"></i> Pencarian Nama</label>
+            <input type="text" name="name" class="form-control" placeholder="Masukkan nama pelanggan" value="{{ request('name') }}">
         </div>
 
         <div class="filter-actions">
@@ -152,3 +141,100 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Export to Excel functionality - single click to download
+    document.getElementById('btn-export-excel').addEventListener('click', function() {
+        // Get table data
+        const table = document.getElementById('transcript-table');
+        const rows = table.querySelectorAll('tbody tr');
+
+        if (rows.length === 0) {
+            alert('Tidak ada data untuk diekspor.');
+            return;
+        }
+
+        // Prepare data
+        const data = [];
+        const headers = [
+            'No', 'ID Transaksi', 'ID Pelanggan', 'Pelanggan',
+            'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+            'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+            'Total', 'Metode'
+        ];
+        data.push(headers);
+
+        // Add rows
+        rows.forEach((row, index) => {
+            const cells = row.querySelectorAll('td');
+            const rowData = [
+                index + 1,
+                cells[1].textContent.trim(),
+                cells[2].textContent.trim(),
+                cells[3].textContent.trim(),
+                cells[4].textContent.trim(),
+                cells[5].textContent.trim(),
+                cells[6].textContent.trim(),
+                cells[7].textContent.trim(),
+                cells[8].textContent.trim(),
+                cells[9].textContent.trim(),
+                cells[10].textContent.trim(),
+                cells[11].textContent.trim(),
+                cells[12].textContent.trim(),
+                cells[13].textContent.trim(),
+                cells[14].textContent.trim(),
+                cells[15].textContent.trim(),
+                cells[16].textContent.trim(),
+                cells[17].textContent.trim()
+            ];
+            data.push(rowData);
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // Set column widths
+        const wscols = [
+            {wch: 5},   // No
+            {wch: 20},  // ID Transaksi
+            {wch: 15},  // ID Pelanggan
+            {wch: 25},  // Pelanggan
+            {wch: 8},   // Jan
+            {wch: 8},   // Feb
+            {wch: 8},   // Mar
+            {wch: 8},   // Apr
+            {wch: 8},   // Mei
+            {wch: 8},   // Jun
+            {wch: 8},   // Jul
+            {wch: 8},   // Agu
+            {wch: 8},   // Sep
+            {wch: 8},   // Okt
+            {wch: 8},   // Nov
+            {wch: 8},   // Des
+            {wch: 15},  // Total
+            {wch: 10}   // Metode
+        ];
+        ws['!cols'] = wscols;
+
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Transkrip Pembayaran');
+
+        // Generate filename with current date
+        const today = new Date();
+        const dateStr = today.getFullYear() + '-' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(today.getDate()).padStart(2, '0');
+        const filename = `transkrip_pembayaran_${dateStr}.xlsx`;
+
+        // Save file directly - single click download
+        XLSX.writeFile(wb, filename);
+
+        alert(`File ${filename} berhasil diunduh!`);
+    });
+});
+</script>
+@endpush

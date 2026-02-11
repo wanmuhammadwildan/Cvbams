@@ -11,6 +11,31 @@ use App\Imports\PaymentImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PaymentController extends Controller {
+
+    private function resolvePackagePrice(?string $package): int
+    {
+        if (!$package) {
+            return 0;
+        }
+
+        $normalized = strtolower($package);
+
+        // Paket lama (legacy/new format)
+        if ((str_contains($normalized, 'lama') || str_contains($normalized, 'paket lama')) && str_contains($normalized, '10')) return 100000;
+        if ((str_contains($normalized, 'lama') || str_contains($normalized, 'paket lama')) && str_contains($normalized, '15')) return 150000;
+        if ((str_contains($normalized, 'lama') || str_contains($normalized, 'paket lama')) && str_contains($normalized, '25')) return 250000;
+
+        // Paket baru (legacy/new format)
+        if ((str_contains($normalized, 'baru') || str_contains($normalized, 'paket baru')) && str_contains($normalized, '10')) return 110000;
+        if ((str_contains($normalized, 'baru') || str_contains($normalized, 'paket baru')) && str_contains($normalized, '15')) return 165000;
+        if ((str_contains($normalized, 'baru') || str_contains($normalized, 'paket baru')) && str_contains($normalized, '25')) return 275000;
+
+        // Fallback data lama yang belum spesifik (tetap agar tidak error)
+        if ($normalized === 'lama') return 100000;
+        if ($normalized === 'baru') return 110000;
+
+        return 0;
+    }
     
 public function index(Request $request)
 {
@@ -30,10 +55,7 @@ public function index(Request $request)
             return response()->json(['error' => 'Pelanggan tidak ditemukan'], 404);
         }
         
-        $price = 0;
-        if(str_contains($customer->package, '10 Mbps')) $price = 110000;
-        elseif(str_contains($customer->package, '15 Mbps')) $price = 165000;
-        elseif(str_contains($customer->package, '25 Mbps')) $price = 275000;
+        $price = $this->resolvePackagePrice($customer->package);
 
         return response()->json([
             'full_name' => $customer->full_name,

@@ -26,6 +26,13 @@ class TranscriptController extends Controller {
             $query->where('payment_method', $request->payment_method);
         }
 
+        // 4. FILTER: Nama Pelanggan
+        if ($request->filled('name')) {
+            $query->whereHas('customer', function($q) use ($request) {
+                $q->where('full_name', 'like', '%' . $request->name . '%');
+            });
+        }
+
         // Ambil data dengan urutan terbaru
         $payments = $query->orderBy('created_at', 'desc')->get();
 

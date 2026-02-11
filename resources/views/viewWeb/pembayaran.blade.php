@@ -26,13 +26,6 @@
 @section('content')
 <div class="header">
     <h2>Pembayaran</h2>
-    <div class="user-info">
-        <div>
-            <h4>{{ Auth::user()->full_name }}</h4>
-            <p style="font-size: 0.8rem; color: #95a5a6;">{{ ucfirst(Auth::user()->role) }}</p>
-        </div>
-        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->full_name) }}&background=3498db&color=fff" alt="Avatar">
-    </div>
 </div>
 
 @if(session('success'))
@@ -72,7 +65,12 @@
                     <label>ID Pelanggan</label>
                     <div class="input-with-action">
                         <input type="text" id="input-id-search" class="form-control" placeholder="Contoh: PLG-001">
-                        <button type="button" class="btn-action" id="btn-fetch-customer"><i class="fas fa-search"></i></button>
+                        <button type="button" class="btn-action" id="btn-fetch-customer">
+                            <i class="fas fa-search"></i>
+                            <span id="loading-indicator" style="display: none; margin-left: 5px;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -145,22 +143,7 @@
 
 <div id="riwayat-pembayaran" class="tab-content {{ session('success') ? 'active' : '' }}">
     
-    <div class="import-box">
-        <div class="import-info">
-            <i class="fas fa-file-excel"></i>
-            <div>
-                <h4 style="margin: 0;">Pindah Data dari Excel</h4>
-                <p style="margin: 0; font-size: 0.85rem; color: #7f8c8d;">Pilih file Laporan_CV_BAMS_2026-02-02.xlsx untuk migrasi data.</p>
-            </div>
-        </div>
-        <form action="{{ route('pembayaran.import') }}" method="POST" enctype="multipart/form-data" class="import-form">
-            @csrf
-            <input type="file" name="file_excel" class="form-control" accept=".xlsx, .xls, .csv" required>
-            <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
-                <i class="fas fa-upload"></i> Mulai Pindah Data
-            </button>
-        </form>
-    </div>
+ 
 
 <div class="list-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
     <h3><i class="fas fa-history"></i> Riwayat Pembayaran Terakhir</h3>
@@ -171,6 +154,8 @@
             <option value="bri" {{ request('filter_method') == 'bri' ? 'selected' : '' }}>BRI</option>
             <option value="bca" {{ request('filter_method') == 'bca' ? 'selected' : '' }}>BCA</option>
             <option value="jatim" {{ request('filter_method') == 'jatim' ? 'selected' : '' }}>JATIM</option>
+            <option value="bni" {{ request('filter_method') == 'bni' ? 'selected' : '' }}>BNI</option>
+            <option value="mandiri" {{ request('filter_method') == 'mandiri' ? 'selected' : '' }}>MANDIRI   </option>
         </select>
     </form>
 </div>
@@ -221,10 +206,71 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. LOGIKA PERPINDAHAN TAB ---
         const tabs = document.querySelectorAll('.tab-btn');
         const contents = document.querySelectorAll('.tab-content');
+        const btnFetch = document.getElementById('btn-fetch-customer');
+        const inputId = document.getElementById('input-id-search');
+        const loadingIndicator = document.getElementById('loading-indicator');
 
+        const displayName = document.getElementById('display-name');
+        const displayPackage = document.getElementById('display-package');
+        const customerDbId = document.getElementById('customer-db-id');
+        const displayPrice = document.getElementById('display-price');
+        const inputPaid = document.getElementById('input-paid');
+        const summaryTotal = document.getElementById('summary-total');
+
+        function clearCustomerFields() {
+            displayName.value = '';
+            displayPackage.value = '';
+            customerDbId.value = '';
+            displayPrice.value = '0';
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const price = parseInt(displayPrice.value, 10) || 0;
+            const selectedMonths = document.querySelectorAll('.month-check:checked').length;
+            const total = price * selectedMonths;
+
+            summaryTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
+            inputPaid.value = total;
+        }
+
+        function fetchCustomerData() {
+            const idString = inputId.value.trim();
+
+            if (!idString) {
+                clearCustomerFields();
+                return;
+            }
+
+            if (loadingIndicator) loadingIndicator.style.display = 'inline-block';
+
+            fetch(`/pembayaran/get-customer/${encodeURIComponent(idString)}`)
+                .then(async (res) => {
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Pelanggan tidak ditemukan');
+                    }
+                    return data;
+                })
+                .then((data) => {
+                    displayName.value = data.full_name || '';
+                    displayPackage.value = data.package || '';
+                    customerDbId.value = data.db_id || '';
+                    displayPrice.value = data.price || 0;
+                    updateTotal();
+                })
+                .catch((error) => {
+                    alert(error.message || 'Terjadi kesalahan saat mengambil data pelanggan');
+                    clearCustomerFields();
+                })
+                .finally(() => {
+                    if (loadingIndicator) loadingIndicator.style.display = 'none';
+                });
+        }
+
+        // Tab
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const target = tab.getAttribute('data-tab');
@@ -235,44 +281,25 @@
             });
         });
 
-        // --- 2. AJAX AMBIL DATA PELANGGAN ---
-        const btnFetch = document.getElementById('btn-fetch-customer');
-        const inputId = document.getElementById('input-id-search');
-        
-        if (btnFetch) {
-            btnFetch.addEventListener('click', function() {
-                const idString = inputId.value;
-                if(!idString) return alert('Masukkan ID Pelanggan dulu!');
-
-                fetch(`/pembayaran/get-customer/${idString}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if(data.error) {
-                            alert(data.error);
-                        } else {
-                            document.getElementById('display-name').value = data.full_name;
-                            document.getElementById('display-package').value = data.package;
-                            document.getElementById('customer-db-id').value = data.db_id;
-                            document.getElementById('display-price').value = data.price;
-                            updateTotal();
-                        }
-                    });
+        // Fetch customer by ID
+        if (btnFetch) btnFetch.addEventListener('click', fetchCustomerData);
+        if (inputId) {
+            inputId.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    fetchCustomerData();
+                }
             });
+            inputId.addEventListener('blur', fetchCustomerData);
         }
 
-        // --- 3. LOGIKA HITUNG TOTAL ---
-        function updateTotal() {
-            const price = parseInt(document.getElementById('display-price').value) || 0;
-            const selectedMonths = document.querySelectorAll('.month-check:checked').length;
-            const total = price * selectedMonths;
-            
-            document.getElementById('summary-total').innerText = 'Rp ' + total.toLocaleString('id-ID');
-            document.getElementById('input-paid').value = total;
-        }
-
+        // Recalculate total on month change
         document.querySelectorAll('.month-check').forEach(check => {
             check.addEventListener('change', updateTotal);
         });
+
+        // Initial calculation
+        updateTotal();
     });
 </script>
 @endpush
