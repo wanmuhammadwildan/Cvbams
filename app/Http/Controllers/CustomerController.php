@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // PENTING: Untuk cek login & role
 use App\Imports\CustomerImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class CustomerController extends Controller
 {
@@ -21,7 +22,15 @@ class CustomerController extends Controller
         $aktif = $customers->where('status', 'aktif')->count();
         $nonaktif = $customers->where('status', 'nonaktif')->count();
 
-        return view('viewWeb.customer', compact('customers', 'total', 'aktif', 'nonaktif'));
+        $today = Carbon::today();
+        $dueCustomers = Customer::where('status', 'aktif')
+            ->whereNotNull('expiry_date')
+            ->whereDate('expiry_date', '<=', $today)
+            ->orderBy('expiry_date', 'asc')
+            ->get();
+        $dueCustomersCount = $dueCustomers->count();
+
+        return view('viewWeb.customer', compact('customers', 'total', 'aktif', 'nonaktif', 'dueCustomers', 'dueCustomersCount'));
     }
 
     /**
@@ -78,7 +87,7 @@ class CustomerController extends Controller
 
     $customer->update($request->all()); // Ini otomatis mengambil 'keterangan' dari form
 
-    return redirect()->route('pelanggan.index')->with('success', 'Data Berhasil Diperbarui!');
+    return redirect()->route('pelanggan.index', ['tab' => 'kelola-pelanggan'])->with('success', 'Data Berhasil Diperbarui!');
 }
 
     /**
@@ -94,7 +103,7 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $customer->delete();
 
-        return redirect()->route('pelanggan.index')->with('success', 'Data pelanggan berhasil dihapus!');
+        return redirect()->route('pelanggan.index', ['tab' => 'kelola-pelanggan'])->with('success', 'Data pelanggan berhasil dihapus!');
     }
     public function import(Request $request) 
 {

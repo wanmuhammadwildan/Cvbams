@@ -48,6 +48,50 @@
             <div class="stat-label">Pelanggan Non-Aktif</div>
             <div class="stat-subtitle">Total saat ini</div>
         </div>
+
+        <button type="button" class="stat-card due-member due-card-btn" id="openDueCustomersModal">
+            <i class="fas fa-calendar-times stat-icon"></i>
+            <div class="stat-value">{{ $dueCustomersCount }}</div>
+            <div class="stat-label">Jatuh Tempo</div>
+            <div class="stat-subtitle">Klik untuk lihat kelompok pelanggan</div>
+        </button>
+    </div>
+
+    <div id="dueCustomersModal" class="due-modal" aria-hidden="true">
+        <div class="due-modal-content">
+            <div class="due-modal-header">
+                <h3><i class="fas fa-users"></i> Kelompok Pelanggan Jatuh Tempo</h3>
+                <button type="button" class="due-modal-close" id="closeDueCustomersModal">&times;</button>
+            </div>
+            <div class="due-modal-body">
+                @if($dueCustomersCount > 0)
+                    <table class="due-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>ID Pelanggan</th>
+                                <th>Nama</th>
+                                <th>Paket</th>
+                                <th>Jatuh Tempo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($dueCustomers as $i => $customer)
+                                <tr>
+                                    <td>{{ $i + 1 }}</td>
+                                    <td>{{ $customer->customer_id_string }}</td>
+                                    <td>{{ $customer->full_name }}</td>
+                                    <td>{{ $customer->package }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($customer->expiry_date)->format('d-m-Y') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p class="due-empty">Tidak ada pelanggan yang jatuh tempo saat ini.</p>
+                @endif
+            </div>
+        </div>
     </div>
 
     <div class="content-sections">
@@ -112,6 +156,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 responsive: true,
                 maintainAspectRatio: false, // WAJIB
                 plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    const dueModal = document.getElementById('dueCustomersModal');
+    const openDueBtn = document.getElementById('openDueCustomersModal');
+    const closeDueBtn = document.getElementById('closeDueCustomersModal');
+
+    if (openDueBtn && dueModal) {
+        openDueBtn.addEventListener('click', function() {
+            dueModal.classList.add('show');
+            dueModal.setAttribute('aria-hidden', 'false');
+        });
+    }
+
+    if (closeDueBtn && dueModal) {
+        closeDueBtn.addEventListener('click', function() {
+            dueModal.classList.remove('show');
+            dueModal.setAttribute('aria-hidden', 'true');
+        });
+    }
+
+    if (dueModal) {
+        dueModal.addEventListener('click', function(e) {
+            if (e.target === dueModal) {
+                dueModal.classList.remove('show');
+                dueModal.setAttribute('aria-hidden', 'true');
             }
         });
     }

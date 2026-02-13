@@ -59,15 +59,15 @@
         <i class="fas fa-lock"></i> <strong>Mode Terbatas:</strong> Anda hanya dapat melihat data. Penambahan data hanya untuk Super Admin.
     </div>
 @endif
-                <button class="tab-btn active" data-tab="tambah-pelanggan">
+                <button class="tab-btn" data-tab="tambah-pelanggan">
                     <i class="fas fa-user-plus"></i> Tambah Pelanggan Baru
                 </button>
-                <button class="tab-btn" data-tab="kelola-pelanggan">
+                <button class="tab-btn active" data-tab="kelola-pelanggan">
                     <i class="fas fa-list"></i> Kelola Pelanggan
                 </button>
             </div>
 
-            <div id="tambah-pelanggan" class="tab-content active">
+            <div id="tambah-pelanggan" class="tab-content">
                 <div class="form-header">
                     <h3><i class="fas fa-user-plus"></i> Tambah Pelanggan Baru</h3>
                     <p>Tambah data pelanggan baru ke dalam sistem ISP</p>
@@ -163,7 +163,7 @@
                 </form>
             </div>
 
-            <div id="kelola-pelanggan" class="tab-content">
+            <div id="kelola-pelanggan" class="tab-content active">
                 <div class="list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h3><i class="fas fa-users-cog"></i> Kelola Data Pelanggan</h3>
                     <div class="header-actions">
@@ -218,9 +218,46 @@
                         <div class="stat-summary-value" style="font-size: 2rem; font-weight: bold;">{{ $nonaktif }}</div>
                         <div class="stat-summary-label" style="color: #95a5a6;">Pelanggan Nonaktif</div>
                     </div>
-                    <div class="stat-summary-card" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-bottom: 3px solid #e74c3c;">
-                        <div class="stat-summary-value" style="font-size: 2rem; font-weight: bold;">0</div>
-                        <div class="stat-summary-label" style="color: #95a5a6;">Jatuh Tempo Hari Ini</div>
+                    <button type="button" id="openDueCustomersModal" class="stat-summary-card" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border: none; border-bottom: 3px solid #e74c3c; cursor: pointer;">
+                        <div class="stat-summary-value" style="font-size: 2rem; font-weight: bold;">{{ $dueCustomersCount }}</div>
+                        <div class="stat-summary-label" style="color: #95a5a6;">Kelompok Jatuh Tempo</div>
+                    </button>
+                </div>
+
+                <div id="dueCustomersModal" style="display:none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; padding: 16px;">
+                    <div style="background: #fff; width: min(900px, 100%); max-height: 85vh; overflow: auto; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                        <div style="display:flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #eee;">
+                            <h3 style="margin: 0;"><i class="fas fa-users"></i> Kelompok Pelanggan Jatuh Tempo</h3>
+                            <button type="button" id="closeDueCustomersModal" style="border:none; background:transparent; font-size: 1.8rem; cursor:pointer; color:#666;">&times;</button>
+                        </div>
+                        <div style="padding: 16px 20px 20px;">
+                            @if($dueCustomersCount > 0)
+                                <table style="width:100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align:left; padding:10px 8px; border-bottom:1px solid #eee;">No</th>
+                                            <th style="text-align:left; padding:10px 8px; border-bottom:1px solid #eee;">ID Pelanggan</th>
+                                            <th style="text-align:left; padding:10px 8px; border-bottom:1px solid #eee;">Nama</th>
+                                            <th style="text-align:left; padding:10px 8px; border-bottom:1px solid #eee;">Paket</th>
+                                            <th style="text-align:left; padding:10px 8px; border-bottom:1px solid #eee;">Jatuh Tempo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($dueCustomers as $i => $customer)
+                                            <tr>
+                                                <td style="padding:10px 8px; border-bottom:1px solid #f2f2f2;">{{ $i + 1 }}</td>
+                                                <td style="padding:10px 8px; border-bottom:1px solid #f2f2f2;">{{ $customer->customer_id_string }}</td>
+                                                <td style="padding:10px 8px; border-bottom:1px solid #f2f2f2;">{{ $customer->full_name }}</td>
+                                                <td style="padding:10px 8px; border-bottom:1px solid #f2f2f2;">{{ $customer->package }}</td>
+                                                <td style="padding:10px 8px; border-bottom:1px solid #f2f2f2;">{{ \Carbon\Carbon::parse($customer->expiry_date)->format('d-m-Y') }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <p style="margin:0; color:#7f8c8d;">Tidak ada pelanggan yang jatuh tempo saat ini.</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
 
@@ -268,7 +305,7 @@
     data-status="{{ $item->status }}" 
     data-package="{{ $item->package }}"
     data-keterangan="{{ $item->keterangan }}"  {{-- <--- TAMBAHKAN INI --}}
-    style="...">
+    style="background: #f39c12; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; display:inline-flex; align-items:center; justify-content:center; min-width: 32px; min-height: 30px;">
     <i class="fas fa-edit"></i>
 </button>
                                      @php
@@ -451,5 +488,64 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
     <script src="{{ asset('js/pelanggan.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabFromUrl = urlParams.get('tab');
+            const savedTab = localStorage.getItem('activePelangganTab');
+            const defaultTab = tabFromUrl || savedTab || 'kelola-pelanggan';
+
+            function activateTab(tabId) {
+                tabBtns.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+                const targetContent = document.getElementById(tabId);
+
+                if (targetBtn && targetContent) {
+                    targetBtn.classList.add('active');
+                    targetContent.classList.add('active');
+                }
+            }
+
+            activateTab(defaultTab);
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    localStorage.setItem('activePelangganTab', this.getAttribute('data-tab'));
+                });
+            });
+        });
+    </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dueModal = document.getElementById('dueCustomersModal');
+    const openDueBtn = document.getElementById('openDueCustomersModal');
+    const closeDueBtn = document.getElementById('closeDueCustomersModal');
+
+    if (openDueBtn && dueModal) {
+        openDueBtn.addEventListener('click', function() {
+            dueModal.style.display = 'flex';
+        });
+    }
+
+    if (closeDueBtn && dueModal) {
+        closeDueBtn.addEventListener('click', function() {
+            dueModal.style.display = 'none';
+        });
+    }
+
+    if (dueModal) {
+        dueModal.addEventListener('click', function(e) {
+            if (e.target === dueModal) {
+                dueModal.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
 </body>
 </html>

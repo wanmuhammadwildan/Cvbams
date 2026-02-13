@@ -10,13 +10,13 @@ return new class extends Migration {
     Schema::create('customers', function (Blueprint $table) {
         $table->id();
         $table->string('customer_id_string')->unique();
-        $table->string('full_name'); // Pastikan tulisannya 'full_name' bukan 'name'        $table->string('phone');
+        $table->string('full_name');
         $table->text('address');
         $table->string('package');
         $table->date('installation_date');
-        $table->date('expiry_date')->nullable(); // TAMBAHKAN BARIS INI
+        $table->date('expiry_date')->nullable();
         $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-        $table->string('phone')->nullable(); // Kolom yang menyebabkan error tadi
+        $table->string('phone')->nullable();
         $table->text('notes')->nullable();
         $table->timestamps();
     });

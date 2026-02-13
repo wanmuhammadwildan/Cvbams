@@ -15,21 +15,6 @@
     @stack('styles')
 </head>
 <body>
-    <div class="user-info">
-    <div style="text-align: right; margin-right: 15px;">
-        <h4 style="margin: 0; font-size: 0.95rem;">{{ Auth::user()->full_name }}</h4>
-        <p style="margin: 0; font-size: 0.8rem; color: #95a5a6;">
-            {{ Auth::user()->role == 'super_admin' ? 'Super Admin' : 'Admin' }}
-        </p>
-    </div>
-    
-    <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-        @csrf
-        <button type="submit" title="Logout" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; padding: 10px;">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
-    </form>
-</div>
     @stack('scripts')
     <div class="container">
         <aside class="sidebar">
@@ -42,6 +27,29 @@
                 <li> <a href="{{ route('pembayaran.index') }}" class="{{ request()->is('pembayaran*') ? 'active' : '' }}"><i class="fas fa-credit-card"></i> Pembayaran </a></li>
                 <li> <a href="{{ route('transkrip.index') }}" class="{{ request()->is('transkrip*') ? 'active' : '' }}"></i> Transkrip</a></li>
             </ul>
+
+            <div class="sidebar-user-box">
+                @php
+                    $roleLabel = Auth::user()->role == 'super_admin' ? 'Super Admin' : 'Admin';
+                    $name = Auth::user()->full_name ?? 'User';
+                    $parts = preg_split('/\s+/', trim($name));
+                    $initials = strtoupper(substr($parts[0] ?? 'U', 0, 1) . substr($parts[1] ?? '', 0, 1));
+                @endphp
+
+                <div class="sidebar-user-avatar" aria-hidden="true">{{ $initials }}</div>
+                <div class="sidebar-user-meta">
+                    <h4 title="{{ $name }}">{{ $name }}</h4>
+                    <span class="sidebar-role-badge {{ Auth::user()->role == 'super_admin' ? 'is-super-admin' : 'is-admin' }}">
+                        {{ $roleLabel }}
+                    </span>
+                </div>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="sidebar-logout-btn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
         </aside>
 
         <main class="main-content">

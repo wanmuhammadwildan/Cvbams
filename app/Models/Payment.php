@@ -13,12 +13,14 @@ class Payment extends Model
         'amount_paid', 
         'payment_method', 
         'paid_months', // WAJIB DITAMBAHKAN
+        'previous_expiry_date',
         'notes'
     ];
 
     // Mengubah JSON di database otomatis menjadi Array di Laravel
     protected $casts = [
         'paid_months' => 'array',
+        'previous_expiry_date' => 'date:Y-m-d',
     ];
 
     public function customer()

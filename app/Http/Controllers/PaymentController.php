@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str; 
+use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Imports\PaymentImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -78,23 +79,62 @@ public function index(Request $request)
             'amount_paid.required' => 'Masukkan jumlah pembayaran!',
         ]);
 
-        // 2. SIMPAN: Kirim $request->months LANGSUNG sebagai array. 
+        $customer = Customer::find($request->customer_id);
+        $previousExpiryDate = $customer?->expiry_date;
+
+        // 2. SIMPAN: Kirim $request->months LANGSUNG sebagai array.
         // JANGAN pakai json_encode karena sudah di-handle oleh Casting di Model.
-        Payment::create([
+        $payment = Payment::create([
             'customer_id' => $request->customer_id, 
             'transaction_id' => 'TRX-' . strtoupper(Str::random(8)), 
             'period_months' => count($request->months), 
             'amount_paid' => $request->amount_paid,
             'payment_method' => $request->payment_method,
             'paid_months' => $request->months, // PERBAIKAN: Hapus json_encode()
+            'previous_expiry_date' => $previousExpiryDate,
             'notes' => $request->notes
         ]);
+
+        // Update jatuh tempo pelanggan tetap tanggal 15 setiap bulan
+        if ($customer) {
+            $paidMonths = max(1, count($request->months));
+
+            $baseDue = $customer->expiry_date
+                ? Carbon::parse($customer->expiry_date)
+                : now();
+
+            $dueOn15 = Carbon::create($baseDue->year, $baseDue->month, 15);
+            $nextDue = $dueOn15->copy()->addMonthsNoOverflow($paidMonths);
+
+            $customer->update([
+                'expiry_date' => $nextDue->format('Y-m-d')
+            ]);
+        }
 
         return redirect()->route('pembayaran.index')->with('success', 'Pembayaran berhasil dicatat!');
     }
 
     public function destroy($id) {
-        $payment = Payment::findOrFail($id);
+        $payment = Payment::with('customer')->findOrFail($id);
+
+        // Jika transaksi yang dihapus adalah input pembayaran terakhir customer,
+        // maka jatuh tempo dikembalikan ke kondisi sebelum transaksi itu dibuat.
+        $customer = $payment->customer;
+        if ($customer) {
+            $latestPayment = Payment::where('customer_id', $customer->id)
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->first();
+
+            if ($latestPayment && $latestPayment->id === $payment->id) {
+                $customer->update([
+                    'expiry_date' => $payment->previous_expiry_date
+                        ? Carbon::parse($payment->previous_expiry_date)->format('Y-m-d')
+                        : null
+                ]);
+            }
+        }
+
         $payment->delete();
         return redirect()->route('pembayaran.index')->with('success', 'Transaksi telah dibatalkan.');
     }

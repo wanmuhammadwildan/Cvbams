@@ -95,6 +95,21 @@
     border-left-color: #e74c3c;
 }
 
+.stat-card.due-member {
+    border-left-color: #9b59b6;
+}
+
+.stat-card.due-member .stat-icon {
+    color: #9b59b6;
+}
+
+.due-card-btn {
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+}
+
 .stat-icon {
     font-size: 1.8rem;
     margin-bottom: 10px;
@@ -270,4 +285,66 @@
     .stats-container {
         grid-template-columns: 1fr;
     }
+}
+
+/* Modal Kelompok Jatuh Tempo */
+.due-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+}
+
+.due-modal.show {
+    display: flex;
+}
+
+.due-modal-content {
+    width: min(900px, 100%);
+    max-height: 85vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.due-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.due-modal-close {
+    border: none;
+    background: transparent;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.due-modal-body {
+    padding: 16px 20px 20px;
+}
+
+.due-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.due-table th,
+.due-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f1f1f1;
+    text-align: left;
+}
+
+.due-empty {
+    margin: 4px 0;
+    color: #7f8c8d;
 }

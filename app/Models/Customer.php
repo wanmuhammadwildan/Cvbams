@@ -13,8 +13,10 @@ class Customer extends Model
     'customer_id_string', 
     'package', 
     'installation_date', 
+    'expiry_date',
     'status', 
     'phone',
+    'notes',
     'keterangan'
 ];
 }

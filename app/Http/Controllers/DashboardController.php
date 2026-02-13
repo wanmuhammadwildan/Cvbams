@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -24,6 +25,15 @@ class DashboardController extends Controller
         $activeCustomers = Customer::where('status', 'aktif')->count();
         $inactiveCustomers = Customer::where('status', 'nonaktif')->count();
 
+        // 3b. Kelompok pelanggan jatuh tempo (tanggal jatuh tempo sudah lewat / hari ini)
+        $today = Carbon::today();
+        $dueCustomers = Customer::where('status', 'aktif')
+            ->whereNotNull('expiry_date')
+            ->whereDate('expiry_date', '<=', $today)
+            ->orderBy('expiry_date', 'asc')
+            ->get();
+        $dueCustomersCount = $dueCustomers->count();
+
         // 4. Data untuk Grafik Distribusi Pembayaran (Doughnut Chart)
         $paymentMethods = Payment::select('payment_method', DB::raw('count(*) as total'))
             ->groupBy('payment_method')
@@ -38,7 +48,8 @@ class DashboardController extends Controller
 
         return view('viewWeb.index', compact(
             'totalPayments', 'totalRevenue', 'activeCustomers', 
-            'inactiveCustomers', 'start', 'end', 'paymentMethods', 'trends'
+            'inactiveCustomers', 'start', 'end', 'paymentMethods', 'trends',
+            'dueCustomers', 'dueCustomersCount'
         ));
     }
 }
