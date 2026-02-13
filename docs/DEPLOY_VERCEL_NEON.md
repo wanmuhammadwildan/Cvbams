@@ -51,13 +51,26 @@ Jika muncul error:
 maka lakukan ini di Vercel Project → **Settings → Build and Output Settings**:
 
 - **Framework Preset**: `Other`
-- **Build Command**: *(kosongkan)* atau `php -v`
+- **Build Command**: `php -v`
 - **Output Directory**: *(kosongkan)*
-- **Install Command**: default
+- **Install Command**: *(kosongkan)*
 
 Project ini bukan SPA React/Vue yang menghasilkan folder `dist`. Routing utama sudah ditangani oleh `vercel.json` + `api/index.php`.
 
 > Catatan: `vercel.json` pada project ini sudah ditambahkan `"outputDirectory": "public"` untuk mencegah Vercel memaksa mencari `dist`.
+
+### Jika muncul error: `sh: line 1: default: command not found`
+
+Itu berarti ada field command di Vercel yang terisi teks **`default`** (bukan mode default, tapi dianggap perintah shell).
+
+Perbaikan cepat:
+1. Buka **Settings → Build and Output Settings**.
+2. Hapus teks `default` dari:
+   - Build Command
+   - Install Command
+   - Output Directory
+3. Isi ulang persis seperti di atas.
+4. Simpan lalu **Redeploy**.
 
 ---
 
@@ -106,19 +119,27 @@ Copy hasil `base64:...` lalu paste ke env var `APP_KEY` di Vercel.
 
 ## 6) Jalankan Migration ke Neon (dari lokal)
 
-Karena Vercel serverless **bukan tempat ideal** untuk migrate interaktif, lakukan dari lokal:
-
 1. Set `.env` lokal sementara ke DB Neon:
-   - `DB_CONNECTION=pgsql`
+
    - `DATABASE_URL=postgresql://...`
+   - `DB_CONNECTION=pgsql`
    - `DB_SSLMODE=require`
-2. Jalankan:
+
+2. (Opsional cek koneksi cepat)
+
+```bash
+php artisan tinker --execute "DB::connection()->getPdo(); echo 'NEON OK';"
+```
+
+Jika berhasil akan tampil `NEON OK`.
+
+3. Jalankan migration:
 
 ```bash
 php artisan migrate --force
 ```
 
-3. Jika perlu user awal/admin, jalankan seeder:
+4. Jika perlu user awal/admin, jalankan seeder:
 
 ```bash
 php artisan db:seed --force
@@ -132,6 +153,16 @@ Setelah env sudah lengkap dan migrasi selesai:
 
 1. Vercel → Deployments → pilih latest → **Redeploy**
 2. Cek website.
+
+---
+
+## 7b) Urutan paling aman (anti bingung)
+
+1. Rapikan Build Settings Vercel (jangan ada kata `default`).
+2. Isi ENV Vercel (`APP_KEY`, `DB_CONNECTION`, `DATABASE_URL`, dll).
+3. Migrasi database ke Neon dari lokal.
+4. Redeploy Vercel.
+5. Cek login + halaman utama.
 
 ---
 
