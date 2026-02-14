@@ -7,6 +7,18 @@
     },
     "rewrites": [
         {
+            "source": "/css/(.*)",
+            "destination": "/public/css/$1"
+        },
+        {
+            "source": "/js/(.*)",
+            "destination": "/public/js/$1"
+        },
+        {
+            "source": "/build/(.*)",
+            "destination": "/public/build/$1"
+        },
+        {
             "source": "/(.*)",
             "destination": "/api/index.php"
         }
@@ -16,6 +28,7 @@
         "APP_DEBUG": "true",
         "APP_KEY": "base64:+olQzWh7HWbshfHNwA+iXj0lsEpy9YDoStJ68NbVM/Y=",
         "APP_URL": "https://cvbams.vercel.app",
+        "ASSET_URL": "https://cvbams.vercel.app",
         "VIEW_COMPILED_PATH": "/tmp",
         "APP_SERVICES_CACHE": "/tmp/services.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
