@@ -275,7 +275,6 @@
                                 <th>Jatuh Tempo</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
-                                <th width="120">Aksi</th>
                             </tr>
                             
                         </thead>
@@ -321,7 +320,7 @@
         . "- Mandiri\n1710006839313\n"
         . "- BNI\n0209467638\n"
         . "- BCA\n0901329604\n"
-        . "- Bank Jatim\1652021740\n"
+        . "- Bank Jatim\n1652021740\n"
         . "(Transfer ke rekening resmi atas nama *PURWATI*)\n\n"
         . " Setelah melakukan pembayaran, mohon kirimkan *bukti transfer* "
         . "melalui WhatsApp ini agar dapat segera kami proses.\n\n"
