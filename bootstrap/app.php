@@ -10,6 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withProviders([
+        \Illuminate\View\ViewServiceProvider::class,
+        \Illuminate\Session\SessionServiceProvider::class,
+        \Illuminate\Filesystem\FilesystemServiceProvider::class,
+        \Illuminate\Routing\RoutingServiceProvider::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         //
     })
