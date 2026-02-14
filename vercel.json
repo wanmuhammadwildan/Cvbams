@@ -17,6 +17,8 @@
         "APP_KEY": "base64:0BQFXcVGHfSQ4smOkWA40oqLoa5AGpby5bbOGwc7xFo=",
         "APP_URL": "https://cvbams.vercel.app",
         "VIEW_COMPILED_PATH": "/tmp",
+        "SESSION_DRIVER": "cookie",
+        "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr"
     }
 }
