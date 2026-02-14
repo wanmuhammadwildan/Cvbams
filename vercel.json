@@ -2,11 +2,10 @@
     "version": 2,
     "framework": null,
     "functions": {
-        "api/index.php": {
+        "public/index.php": {
             "runtime": "vercel-php@0.6.1"
         }
     },
-    "cleanUrls": true,
     "rewrites": [
         {
             "source": "/build/(.*)",
@@ -34,7 +33,7 @@
         },
         {
             "source": "/(.*)",
-            "destination": "/api/index.php"
+            "destination": "/public/index.php"
         }
     ],
     "env": {
