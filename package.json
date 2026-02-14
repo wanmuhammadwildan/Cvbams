@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build && mkdir -p dist && echo 'built' > dist/index.html",
+        "build": "vite build && mkdir -p dist && touch dist/.gitkeep",
         "dev": "vite"
     },
     "devDependencies": {
