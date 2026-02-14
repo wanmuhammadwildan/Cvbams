@@ -14,11 +14,13 @@
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "true",
-        "APP_KEY": "base64:0BQFXcVGHfSQ4smOkWA40oqLoa5AGpby5bbOGwc7xFo=",
+        "APP_KEY": "base64:+olQzWh7HWbshfHNwA+iXj0lsEpy9YDoStJ68NbVM/Y=",
         "APP_URL": "https://cvbams.vercel.app",
         "VIEW_COMPILED_PATH": "/tmp",
         "SESSION_DRIVER": "cookie",
         "CACHE_DRIVER": "array",
+        "DB_CONNECTION": "sqlite",
+        "DB_DATABASE": ":memory:",
         "LOG_CHANNEL": "stderr"
     }
 }
