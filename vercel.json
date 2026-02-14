@@ -38,7 +38,8 @@
         "CACHE_STORE": "array",
         "CACHE_DRIVER": "array",
         "DB_CONNECTION": "sqlite",
-        "DB_DATABASE": ":memory:",
+        "DB_DATABASE": "/tmp/database.sqlite",
+        "VERCEL": "1",
         "LOG_CHANNEL": "stderr"
     }
 }
